@@ -314,7 +314,6 @@ class InvoiceController extends Controller
                 }
             }
             
-            // Delete invoice (will cascade delete items due to foreign key constraint)
             $invoice->delete();
             
             DB::commit();
@@ -336,7 +335,6 @@ class InvoiceController extends Controller
         try {
             $this->sendInvoiceByEmail($invoice);
             
-            // Update status to sent if it was draft
             if ($invoice->status === 'draft') {
                 $invoice->status = 'sent';
                 $invoice->save();
@@ -358,7 +356,7 @@ class InvoiceController extends Controller
         $pdf = PDF::loadView('invoices.pdf', compact('invoice', 'setting'));
         
         Mail::to($invoice->customer->email)
-    ->send(new InvoiceMail($invoice, $pdf, $setting));  // Pass setting here
+    ->send(new InvoiceMail($invoice, $pdf, $setting));  
     }
     
     public function downloadPdf(Invoice $invoice)
@@ -398,11 +396,9 @@ class InvoiceController extends Controller
                 ->with('error', 'Cannot cancel a paid invoice.');
         }
         
-        // Start transaction
         DB::beginTransaction();
         
         try {
-            // Restore product stock
             foreach ($invoice->items as $item) {
                 if ($item->product_id) {
                     $product = Product::find($item->product_id);

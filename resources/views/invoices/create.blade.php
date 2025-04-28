@@ -290,128 +290,132 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let rowIndex = document.querySelectorAll('.item-row').length;
+    let rowIndex = document.querySelectorAll('.item-row').length;
+    
+    // Add new item row
+    document.getElementById('addItemBtn').addEventListener('click', function() {
+        const template = document.getElementById('item-template').innerHTML;
+        const newRow = template.replace(/__INDEX__/g, rowIndex);
         
-        // Add new item row
-        document.getElementById('addItemBtn').addEventListener('click', function() {
-            const template = document.getElementById('item-template').innerHTML;
-            const newRow = template.replace(/__INDEX__/g, rowIndex);
-            
-            document.querySelector('#itemsTable tbody').insertAdjacentHTML('beforeend', newRow);
-            bindRowEvents(document.querySelectorAll('.item-row')[rowIndex]);
-            rowIndex++;
-            
-            // Update totals
-            updateTotals();
-        });
+        document.querySelector('#itemsTable tbody').insertAdjacentHTML('beforeend', newRow);
         
-        // Bind events to existing rows
-        document.querySelectorAll('.item-row').forEach(function(row) {
-            bindRowEvents(row);
-        });
+        // Fix: Get the newly added row directly
+        const addedRow = document.querySelector('#itemsTable tbody').lastElementChild;
+        bindRowEvents(addedRow);
         
-        // Handle delete row event
-        document.querySelector('#itemsTable tbody').addEventListener('click', function(e) {
-            if (e.target.classList.contains('delete-row')) {
-                const rows = document.querySelectorAll('.item-row');
-                if (rows.length > 1) {
-                    e.target.closest('tr').remove();
-                    updateTotals();
-                } else {
-                    alert('Invoice must have at least one item.');
-                }
-            }
-        });
+        rowIndex++;
         
-        // Handle tax and discount changes
-        document.getElementById('tax_percent').addEventListener('input', updateTotals);
-        document.getElementById('discount_percent').addEventListener('input', updateTotals);
-        
-        // Initial calculation
+        // Update totals
         updateTotals();
-        
-        // Form validation
-        document.getElementById('invoiceForm').addEventListener('submit', function(e) {
-            const itemRows = document.querySelectorAll('.item-row');
-            if (itemRows.length === 0) {
-                e.preventDefault();
-                alert('Please add at least one item to the invoice.');
-                return false;
+    });
+    
+    // Bind events to existing rows
+    document.querySelectorAll('.item-row').forEach(function(row) {
+        bindRowEvents(row);
+    });
+    
+    // Handle delete row event
+    document.querySelector('#itemsTable tbody').addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-row')) {
+            const rows = document.querySelectorAll('.item-row');
+            if (rows.length > 1) {
+                e.target.closest('tr').remove();
+                updateTotals();
+            } else {
+                alert('Invoice must have at least one item.');
             }
-            
-            // Update all calculations before submit
-            updateTotals();
-            return true;
-        });
-        
-        // Function to bind events to row elements
-        function bindRowEvents(row) {
-            // Product selection
-            const productSelect = row.querySelector('.product-select');
-            productSelect.addEventListener('change', function() {
-                const option = this.options[this.selectedIndex];
-                if (option.value) {
-                    row.querySelector('.item-price').value = option.dataset.price;
-                    row.querySelector('.item-description').value = option.dataset.description || '';
-                } else {
-                    row.querySelector('.item-price').value = '0.00';
-                    row.querySelector('.item-description').value = '';
-                }
-                updateRowTotal(row);
-                updateTotals();
-            });
-            
-            // Quantity and price changes
-            row.querySelector('.item-quantity').addEventListener('input', function() {
-                updateRowTotal(row);
-                updateTotals();
-            });
-            
-            row.querySelector('.item-price').addEventListener('input', function() {
-                updateRowTotal(row);
-                updateTotals();
-            });
-        }
-        
-        // Function to update row subtotal
-        function updateRowTotal(row) {
-            const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
-            const price = parseFloat(row.querySelector('.item-price').value) || 0;
-            const subtotal = quantity * price;
-            row.querySelector('.item-subtotal').value = subtotal.toFixed(2);
-        }
-        
-        // Function to update invoice totals
-        function updateTotals() {
-            let subtotal = 0;
-            
-            // Sum all line items
-            document.querySelectorAll('.item-subtotal').forEach(function(input) {
-                subtotal += parseFloat(input.value) || 0;
-            });
-            
-            // Calculate tax and discount
-            const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
-            const discountPercent = parseFloat(document.getElementById('discount_percent').value) || 0;
-            
-            const taxAmount = subtotal * (taxPercent / 100);
-            const discountAmount = subtotal * (discountPercent / 100);
-            
-            // Calculate final total
-            const total = subtotal + taxAmount - discountAmount;
-            
-            // Update displays
-            document.getElementById('summary-subtotal').textContent = subtotal.toFixed(2);
-            document.getElementById('summary-tax').textContent = taxAmount.toFixed(2);
-            document.getElementById('summary-discount').textContent = discountAmount.toFixed(2);
-            document.getElementById('summary-total').textContent = total.toFixed(2);
-            
-            // Update hidden fields
-            document.getElementById('subtotal').value = subtotal.toFixed(2);
-            document.getElementById('tax_amount').value = taxAmount.toFixed(2);
-            document.getElementById('discount_amount').value = discountAmount.toFixed(2);
-            document.getElementById('total').value = total.toFixed(2);
         }
     });
+    
+    // Handle tax and discount changes
+    document.getElementById('tax_percent').addEventListener('input', updateTotals);
+    document.getElementById('discount_percent').addEventListener('input', updateTotals);
+    
+    // Initial calculation
+    updateTotals();
+    
+    // Form validation
+    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+        const itemRows = document.querySelectorAll('.item-row');
+        if (itemRows.length === 0) {
+            e.preventDefault();
+            alert('Please add at least one item to the invoice.');
+            return false;
+        }
+        
+        // Update all calculations before submit
+        updateTotals();
+        return true;
+    });
+    
+    // Function to bind events to row elements
+    function bindRowEvents(row) {
+        // Product selection
+        const productSelect = row.querySelector('.product-select');
+        productSelect.addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            if (option.value) {
+                row.querySelector('.item-price').value = option.dataset.price;
+                row.querySelector('.item-description').value = option.dataset.description || '';
+            } else {
+                row.querySelector('.item-price').value = '0.00';
+                row.querySelector('.item-description').value = '';
+            }
+            updateRowTotal(row);
+            updateTotals();
+        });
+        
+        // Quantity and price changes
+        row.querySelector('.item-quantity').addEventListener('input', function() {
+            updateRowTotal(row);
+            updateTotals();
+        });
+        
+        row.querySelector('.item-price').addEventListener('input', function() {
+            updateRowTotal(row);
+            updateTotals();
+        });
+    }
+    
+    // Function to update row subtotal
+    function updateRowTotal(row) {
+        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const subtotal = quantity * price;
+        row.querySelector('.item-subtotal').value = subtotal.toFixed(2);
+    }
+    
+    // Function to update invoice totals
+    function updateTotals() {
+        let subtotal = 0;
+        
+        // Sum all line items
+        document.querySelectorAll('.item-subtotal').forEach(function(input) {
+            subtotal += parseFloat(input.value) || 0;
+        });
+        
+        // Calculate tax and discount
+        const taxPercent = parseFloat(document.getElementById('tax_percent').value) || 0;
+        const discountPercent = parseFloat(document.getElementById('discount_percent').value) || 0;
+        
+        const taxAmount = subtotal * (taxPercent / 100);
+        const discountAmount = subtotal * (discountPercent / 100);
+        
+        // Calculate final total
+        const total = subtotal + taxAmount - discountAmount;
+        
+        // Update displays
+        document.getElementById('summary-subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('summary-tax').textContent = taxAmount.toFixed(2);
+        document.getElementById('summary-discount').textContent = discountAmount.toFixed(2);
+        document.getElementById('summary-total').textContent = total.toFixed(2);
+        
+        // Update hidden fields
+        document.getElementById('subtotal').value = subtotal.toFixed(2);
+        document.getElementById('tax_amount').value = taxAmount.toFixed(2);
+        document.getElementById('discount_amount').value = discountAmount.toFixed(2);
+        document.getElementById('total').value = total.toFixed(2);
+    }
+});
 </script>
 @endsection

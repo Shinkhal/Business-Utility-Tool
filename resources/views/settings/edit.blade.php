@@ -18,6 +18,7 @@
 
                     <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
 
                         <div class="row mb-4">
                             <div class="col-md-12">
@@ -53,7 +54,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="tax_number" class="form-label">Tax Number / VAT ID</label>
+                            <label for="tax_number" class="form-label">Tax Number / GST</label>
                                 <input type="text" class="form-control @error('tax_number') is-invalid @enderror" id="tax_number" name="tax_number" value="{{ old('tax_number', $setting->tax_number) }}">
                                 @error('tax_number')
                                     <div class="invalid-feedback">{{ $message }}</div>

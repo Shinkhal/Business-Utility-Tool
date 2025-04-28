@@ -33,7 +33,7 @@
                             </li>
                         @endif
                         
-                        @if($invoice->status == 'draft' || $invoice->status == 'sent')
+                        @if($invoice->status == 'draft' || $invoice->status == 'sent' || $invoice->status == 'paid')
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item" href="{{ route('invoices.send', $invoice) }}"
@@ -99,10 +99,12 @@
             <div class="row mb-4">
                 <div class="col-md-7">
                     <div class="d-flex align-items-center mb-4">
+                        
                         <div>
+                        <img src="{{ Storage::url($setting->company_logo) }}" alt="logo" class="img-fluid rounded" style="height: 100px;">
                             <h4 class="mb-1">{{ $setting->company_name }}</h4>
                             <p class="mb-0">{{ $setting->company_address }}</p>
-                            <p class="mb-0">{{ $setting->company_city }}, {{ $setting->company_state }} {{ $setting->company_postal_code }}</p>
+                            <p class="mb-0">{{ $setting->company_city }}</p>
                             <p class="mb-0">{{ $setting->company_country }}</p>
                             <p class="mb-0">{{ $setting->company_phone }}</p>
                             <p class="mb-0">{{ $setting->company_email }}</p>

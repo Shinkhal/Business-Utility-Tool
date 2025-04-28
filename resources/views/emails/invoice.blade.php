@@ -1,258 +1,234 @@
-<!-- invoices/pdf.blade.php -->
+<!-- invoices/email-template.blade.php -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice #{{ $invoice->invoice_number }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            color: #333;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333333;
             margin: 0;
             padding: 0;
+            background-color: #f7f7f7;
         }
-        .container {
-            width: 100%;
-            max-width: 800px;
+        
+        .email-container {
+            max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .invoice-header {
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .company-logo {
+            margin-bottom: 15px;
+        }
+        
+        .company-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1a5276;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-details {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #1a5276;
+            border-radius: 4px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #1a5276;
+        }
+        
+        .message {
             margin-bottom: 30px;
         }
-        .invoice-header:after {
-            content: "";
-            display: table;
-            clear: both;
+        
+        .invoice-summary {
+            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
         }
-        .company-info {
-            float: left;
-            width: 60%;
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
         }
-        .company-name {
-            font-size: 20px;
+        
+        .summary-label {
             font-weight: bold;
-            margin-bottom: 5px;
-            color: #2c3e50;
+            color: #666666;
         }
-        .invoice-info {
-            float: right;
-            width: 40%;
-            text-align: right;
-        }
-        .invoice-id {
+        
+        .total-row {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #e0e0e0;
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 5px;
-            color: #2c3e50;
+            color: #1a5276;
         }
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-        .status-draft {
-            background-color: #f5f5f5;
-            color: #7f8c8d;
-        }
-        .status-sent {
-            background-color: #3498db;
-            color: #fff;
-        }
-        .status-paid {
-            background-color: #2ecc71;
-            color: #fff;
-        }
-        .status-cancelled {
-            background-color: #e74c3c;
-            color: #fff;
-        }
-        .customer-details, .invoice-details {
-            margin-bottom: 30px;
-        }
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-            color: #2c3e50;
-        }
-        table {
+        
+        .cta-button {
+            display: block;
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        th {
-            background-color: #f5f5f5;
-            text-align: left;
-            padding: 10px;
-            border-bottom: 2px solid #ddd;
-            font-weight: bold;
-        }
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .text-right {
-            text-align: right;
-        }
-        .totals-table {
-            width: 40%;
-            float: right;
-            margin-top: 20px;
-        }
-        .totals-table td {
-            border: none;
-            padding: 5px 10px;
-        }
-        .totals-table .total-row td {
-            border-top: 2px solid #ddd;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 12px;
-            color: #7f8c8d;
+            max-width: 250px;
+            margin: 0 auto 30px;
+            padding: 12px 20px;
+            background-color: #1a5276;
+            color: #ffffff;
             text-align: center;
-        }
-        .notes {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f9f9f9;
+            text-decoration: none;
             border-radius: 4px;
-        }
-        .notes-title {
             font-weight: bold;
-            margin-bottom: 5px;
+            transition: background-color 0.3s ease;
         }
-        .page-break {
-            page-break-after: always;
+        
+        .cta-button:hover {
+            background-color: #154360;
         }
-        .terms {
+        
+        .payment-methods {
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .contact-info {
             margin-top: 30px;
-            font-size: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #666666;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+            font-size: 13px;
+            color: #888888;
+        }
+        
+        .social-links {
+            margin: 15px 0;
+        }
+        
+        .social-link {
+            display: inline-block;
+            margin: 0 10px;
+            color: #1a5276;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="invoice-header">
-            <div class="company-info">
-                <div class="company-name">{{ $setting->company_name }}</div>
-                <div>{{ $setting->address }}</div>
-                <div>{{ $setting->city }}, {{ $setting->state }} {{ $setting->zip }}</div>
-                <div>{{ $setting->country }}</div>
-                <div>{{ $setting->phone }}</div>
-                <div>{{ $setting->email }}</div>
-                @if($setting->vat_number)
-                    <div>VAT: {{ $setting->vat_number }}</div>
-                @endif
-            </div>
-            <div class="invoice-info">
-                <div class="invoice-id">INVOICE #{{ $invoice->invoice_number }}</div>
-                <div class="
-                    status-badge 
-                    status-{{ $invoice->status }}"
-                >
-                    {{ ucfirst($invoice->status) }}
+    <div class="email-container">
+        <div class="header">
+            @if($setting->company_logo)
+                <div class="company-logo">
+                    <img src="{{ $setting->company_logo }}" alt="{{ $setting->company_name }}" width="180">
                 </div>
-                <div><strong>Invoice Date:</strong> {{ $invoice->invoice_date->format('M d, Y') }}</div>
-                <div><strong>Due Date:</strong> {{ $invoice->due_date->format('M d, Y') }}</div>
+            @else
+                <div class="company-name">{{ $setting->company_name }}</div>
+            @endif
+        </div>
+        
+        <div class="greeting">Dear {{ $invoice->customer->name }},</div>
+        
+        <div class="message">
+            <p>Thank you for choosing {{ $setting->company_name }}. We appreciate your business and are pleased to provide you with the invoice for our recent services.</p>
+            
+            <p>Your invoice is now ready and has been attached to this email. Please find the details below:</p>
+        </div>
+        
+        <div class="invoice-details">
+            <div class="summary-row">
+                <span class="summary-label">Invoice Number:</span>
+                <span>{{ $invoice->invoice_number }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Issue Date:</span>
+                <span>{{ $invoice->invoice_date->format('M d, Y') }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Due Date:</span>
+                <span>{{ $invoice->due_date->format('M d, Y') }}</span>
+            </div>
+            <div class="summary-row total-row">
+                <span class="summary-label">Total Amount:</span>
+                <span>{{ $setting->currency_symbol }} {{ number_format($invoice->total, 2) }}</span>
             </div>
         </div>
-
-        <div class="customer-details">
-            <div class="section-title">Bill To</div>
-            <div><strong>{{ $invoice->customer->name }}</strong></div>
-            <div>{{ $invoice->customer->address }}</div>
-            <div>{{ $invoice->customer->city }}, {{ $invoice->customer->state }} {{ $invoice->customer->zip }}</div>
-            <div>{{ $invoice->customer->country }}</div>
-            <div>{{ $invoice->customer->email }}</div>
-            <div>{{ $invoice->customer->phone }}</div>
-            @if($invoice->customer->vat_number)
-                <div>VAT: {{ $invoice->customer->vat_number }}</div>
-            @endif
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 40%">Description</th>
-                    <th style="width: 20%">Quantity</th>
-                    <th style="width: 20%">Unit Price</th>
-                    <th style="width: 20%" class="text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($invoice->items as $item)
-                    <tr>
-                        <td>
-                            <strong>{{ $item->product->name ?? '' }}</strong>
-                            <div>{{ $item->description }}</div>
-                        </td>
-                        <td>{{ $item->quantity }}</td>
-                        <td>{{ $setting->currency_symbol }} {{ number_format($item->price, 2) }}</td>
-                        <td class="text-right">{{ $setting->currency_symbol }} {{ number_format($item->subtotal, 2) }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <table class="totals-table">
-            <tr>
-                <td>Subtotal:</td>
-                <td class="text-right">{{ $setting->currency_symbol }} {{ number_format($invoice->subtotal, 2) }}</td>
-            </tr>
-            @if($invoice->tax_amount > 0)
-            <tr>
-                <td>Tax ({{ $invoice->tax_percent }}%):</td>
-                <td class="text-right">{{ $setting->currency_symbol }} {{ number_format($invoice->tax_amount, 2) }}</td>
-            </tr>
-            @endif
-            @if($invoice->discount_amount > 0)
-            <tr>
-                <td>Discount ({{ $invoice->discount_percent }}%):</td>
-                <td class="text-right">{{ $setting->currency_symbol }} {{ number_format($invoice->discount_amount, 2) }}</td>
-            </tr>
-            @endif
-            <tr class="total-row">
-                <td>Total:</td>
-                <td class="text-right">{{ $setting->currency_symbol }} {{ number_format($invoice->total, 2) }}</td>
-            </tr>
-        </table>
         
-        <div style="clear: both;"></div>
+        <p>For a detailed breakdown of services and charges, please refer to the attached invoice.</p>
         
-        @if($invoice->notes)
-        <div class="notes">
-            <div class="notes-title">Notes</div>
-            <div>{{ $invoice->notes }}</div>
-        </div>
+        @if($invoice->status !== 'paid')
+            <p>We kindly request your prompt attention to this invoice. Payment is due by {{ $invoice->due_date->format('M d, Y') }}.</p>
+            
+            <a href="{{ $paymentUrl ?? '#' }}" class="cta-button">View & Pay Invoice</a>
+            
+            <div class="payment-methods">
+                <p><strong>Payment Methods:</strong></p>
+                <p>{{ $setting->payment_details ?? 'Please refer to the invoice for payment details.' }}</p>
+            </div>
+        @else
+            <p>This invoice has been paid in full. Thank you for your prompt payment.</p>
         @endif
         
-        <div class="terms">
-            <div class="section-title">Payment Terms</div>
-            <div>{{ $setting->payment_terms }}</div>
-            @if($setting->payment_details)
-                <div class="payment-details">
-                    <div class="section-title">Payment Details</div>
-                    <div>{{ $setting->payment_details }}</div>
-                </div>
-            @endif
+        <p>If you have any questions or concerns regarding this invoice, please don't hesitate to contact our billing department:</p>
+        
+        <div class="contact-info">
+            <p><strong>{{ $setting->company_name }} Billing Department</strong></p>
+            <p>Email: {{ $setting->billing_email ?? $setting->company_email }}</p>
+            <p>Phone: {{ $setting->billing_phone ?? $setting->company_phone }}</p>
         </div>
         
+        <p>We value your continued business and look forward to serving you again.</p>
+        
+        <p>Warm regards,</p>
+        <p><strong>{{ $setting->owner_name ?? $setting->company_name }} Team</strong></p>
+        
         <div class="footer">
-            <p>{{ $setting->invoice_footer }}</p>
+            <p>© {{ date('Y') }} {{ $setting->company_name }}. All rights reserved.</p>
+            
+            @if(isset($setting->company_website) || isset($setting->social_facebook) || isset($setting->social_twitter) || isset($setting->social_linkedin))
+                <div class="social-links">
+                    @if(isset($setting->company_website))
+                        <a href="{{ $setting->company_website }}" class="social-link">Website</a>
+                    @endif
+                    @if(isset($setting->social_facebook))
+                        <a href="{{ $setting->social_facebook }}" class="social-link">Facebook</a>
+                    @endif
+                    @if(isset($setting->social_twitter))
+                        <a href="{{ $setting->social_twitter }}" class="social-link">Twitter</a>
+                    @endif
+                    @if(isset($setting->social_linkedin))
+                        <a href="{{ $setting->social_linkedin }}" class="social-link">LinkedIn</a>
+                    @endif
+                </div>
+            @endif
+            
+            <p>This email and any files transmitted with it are confidential and intended solely for the use of the individual or entity to whom they are addressed.</p>
         </div>
     </div>
 </body>
