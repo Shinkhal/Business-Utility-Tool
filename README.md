@@ -110,4 +110,8 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
 
+---
+
+Made with ❤️ by Shinkhal Sinha
+
 
